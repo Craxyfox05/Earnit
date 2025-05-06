@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Home, User, PieChart, Users } from "lucide-react";
+import { Bell, Home, User, PieChart, Users, Flame } from "lucide-react";
 
 // Import components
 import { WalletBalance } from "@/components/ui/wallet-balance";

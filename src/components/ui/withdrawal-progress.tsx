@@ -25,8 +25,8 @@ export function WithdrawalProgress({
   const [showConfetti, setShowConfetti] = useState(false);
   const [lastMilestone, setLastMilestone] = useState<number | null>(null);
 
-  // Calculate progress percentage
-  const progress = Math.min(100, (currentAmount / targetAmount) * 100);
+  // Calculate percentage
+  const percentage = Math.min((currentAmount / targetAmount) * 100, 100);
 
   // Check for newly reached milestones
   useEffect(() => {
@@ -54,88 +54,24 @@ export function WithdrawalProgress({
   }, [currentAmount, milestones, reachedMilestones, onMilestoneReached]);
 
   return (
-    <div className="wallet-card space-y-2">
-      {/* Display current progress text */}
-      <div className="flex justify-between items-center text-sm font-medium">
-        <span className="primary-gradient bg-clip-text text-transparent font-semibold">
-          {currency}
-          {currentAmount} / {currency}
-          {targetAmount} to unlock withdrawal!
-        </span>
-        <span className="secondary-gradient bg-clip-text text-transparent font-bold">
-          {Math.round(progress)}%
-        </span>
+    <div className="w-full space-y-1.5">
+      <div className="flex justify-between items-center text-xs">
+        <span className="font-medium">Withdrawal Progress</span>
+        <span className="text-gray-500">₹{currentAmount}/₹{targetAmount}</span>
       </div>
-
-      {/* Progress bar with milestone indicators */}
-      <div className="relative">
-        <div className="progress-bar-bg rounded-full overflow-hidden w-full h-3">
-          <motion.div 
-            className="progress-bar-fill h-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          />
-        </div>
-
-        {/* Milestone markers */}
-        <div className="absolute inset-0 pointer-events-none">
-          {milestones.map((milestone) => {
-            const milestonePos = (milestone / targetAmount) * 100;
-            const isReached = currentAmount >= milestone;
-
-            return (
-              <div
-                key={milestone}
-                className="absolute top-1/2 -translate-y-1/2"
-                style={{ left: `${milestonePos}%` }}
-              >
-                <motion.div
-                  className={`flex items-center justify-center w-5 h-5 rounded-full -ml-2.5 ${
-                    isReached ? "secondary-gradient depth-shadow" : "bg-white/90 border border-gray-200"
-                  }`}
-                  animate={isReached ? {
-                    scale: [1, 1.2, 1],
-                    boxShadow: ["0px 0px 0px rgba(62, 207, 142, 0)", "0px 0px 12px rgba(62, 207, 142, 0.6)", "0px 0px 4px rgba(62, 207, 142, 0.3)"]
-                  } : {}}
-                  transition={{ duration: 0.5 }}
-                >
-                  {isReached ? (
-                    <CheckCircle2 className="w-3 h-3 text-white" />
-                  ) : (
-                    <span className="text-[9px] font-bold text-foreground/80">
-                      {currency}
-                    </span>
-                  )}
-                </motion.div>
-              </div>
-            );
-          })}
-        </div>
+      <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+        <motion.div 
+          className="h-full bg-gradient-to-r from-green-400 to-green-500"
+          initial={{ width: 0 }}
+          animate={{ width: `${percentage}%` }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        />
       </div>
-
-      {/* Badge that appears when milestone is reached */}
-      <AnimatePresence>
-        {lastMilestone && (
-          <motion.div
-            key={`milestone-${lastMilestone}`}
-            className="rounded-lg secondary-gradient p-2 text-white text-sm font-medium flex items-center justify-center mt-2 trust-shadow"
-            initial={{ opacity: 0, height: 0, y: -10 }}
-            animate={{ opacity: 1, height: "auto", y: 0 }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <CheckCircle2 className="w-4 h-4 mr-2" />
-            <span>
-              {currency}
-              {lastMilestone} milestone reached! 🏅
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Confetti effect when milestone is reached */}
-      <Confetti active={showConfetti} />
+      {currentAmount < targetAmount && (
+        <p className="text-xs text-gray-500">
+          Need ₹{targetAmount - currentAmount} more to withdraw
+        </p>
+      )}
     </div>
   );
 }
