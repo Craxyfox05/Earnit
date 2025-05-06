@@ -103,14 +103,7 @@ export default function DashboardPage() {
     }, 3000);
   };
 
-  // Simulate login after 3 seconds for demo purposes
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoggedIn(true);
-    }, 3000);
-    
-    return () => clearTimeout(timer);
-  }, []);
+  // Removed auto-login for demo purposes
 
   return (
     <div className="w-full px-3 py-2 space-y-4 pb-16">
