@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { UserProvider } from "@/context/UserContext";
 
 interface DialogStateDetail {
   isOpen: boolean;
@@ -40,8 +41,10 @@ export default function ClientBody({
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col antialiased bg-background px-4 py-0 md:px-6">
-      {children}
-    </div>
+    <UserProvider>
+      <div className="flex min-h-screen flex-col antialiased bg-background px-4 py-0 md:px-6">
+        {children}
+      </div>
+    </UserProvider>
   );
 }

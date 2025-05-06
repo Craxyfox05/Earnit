@@ -13,6 +13,7 @@ import { StreakBanner } from "@/components/ui/streak-banner";
 import { ScarcityNotice } from "@/components/ui/scarcity-notice";
 import { RewardAnimation } from "@/components/ui/reward-animation";
 import ImprovedTaskCard from "@/components/tasks/ImprovedTaskCard";
+import { useUser } from "@/context/UserContext";
 
 // Sample task data
 const SAMPLE_TASKS = [
@@ -60,6 +61,7 @@ const SAMPLE_ACTIVITIES = [
 ];
 
 export default function DashboardPage() {
+  const { userData } = useUser();
   const [balance, setBalance] = useState(125);
   const [streakDays, setStreakDays] = useState(3);
   const [showReward, setShowReward] = useState(false);
@@ -100,6 +102,12 @@ export default function DashboardPage() {
         </div>
         <WalletBalance balance={balance} />
       </header>
+
+      {/* Welcome message with user's name */}
+      <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+        <p className="font-medium">Hello, {userData.name.split(' ')[0]}! 👋</p>
+        <p className="text-sm text-gray-500">Welcome back to EarnIt</p>
+      </div>
 
       {/* Progress Bar */}
       <WithdrawalProgress currentAmount={balance} targetAmount={200} />

@@ -44,19 +44,14 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { useUser } from "@/context/UserContext";
 
 export default function ProfilePage() {
-  // User information - in a real app this would come from an API/state
+  const { userData, updateUserData } = useUser();
+  
+  // User state derived from context
   const [user, setUser] = useState({
-    name: 'Ashwin Singh',
-    phone: '+91 9876543210',
-    email: 'ashwin@example.com',
-    joinDate: '2 weeks ago',
-    totalEarned: 235,
-    tasksCompleted: 12,
-    level: 4,
-    xp: 740,
-    nextLevelXp: 1000,
+    ...userData,
     badges: [
       { id: 1, name: "Task Master", description: "Complete 10 tasks", icon: <Trophy size={16} />, color: "bg-amber-500" },
       { id: 2, name: "Early Bird", description: "First 100 users", icon: <Star size={16} />, color: "bg-indigo-500" },
@@ -72,19 +67,33 @@ export default function ProfilePage() {
       { id: 6, name: "First withdrawal", progress: 0, reward: "20 XP", completed: false, category: "earnings" },
     ],
     stats: [
-      { name: "Tasks Completed", value: 12, icon: <ListTodo size={18} className="text-blue-500" /> },
-      { name: "Earnings", value: "₹235", icon: <IndianRupee size={18} className="text-green-500" /> },
-      { name: "Level", value: 4, icon: <TrendingUp size={18} className="text-purple-500" /> },
+      { name: "Tasks Completed", value: userData.tasksCompleted, icon: <ListTodo size={18} className="text-blue-500" /> },
+      { name: "Earnings", value: `₹${userData.totalEarned}`, icon: <IndianRupee size={18} className="text-green-500" /> },
+      { name: "Level", value: userData.level, icon: <TrendingUp size={18} className="text-purple-500" /> },
       { name: "Referrals", value: 3, icon: <Users size={18} className="text-amber-500" /> },
     ]
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user.name,
-    email: user.email,
+    name: '',
+    email: '',
   });
   const [activeTab, setActiveTab] = useState('achievements');
+  
+  // Add states for settings pages
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+
+  // Initialize form data when edit modal opens
+  const openEditProfile = () => {
+    setFormData({
+      name: user.name,
+      email: user.email,
+    });
+    setIsEditing(true);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -94,12 +103,18 @@ export default function ProfilePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // In a real app, this would make an API call to update the profile
+    // Update both the local state and the global context
     setUser(prev => ({
       ...prev,
       name: formData.name,
       email: formData.email,
     }));
+    
+    // Update the global context
+    updateUserData({
+      name: formData.name,
+      email: formData.email
+    });
 
     setIsEditing(false);
     toast.success("Profile updated successfully!");
@@ -118,6 +133,31 @@ export default function ProfilePage() {
   const completedAchievements = user.achievements.filter(ach => ach.completed);
   const inProgressAchievements = user.achievements.filter(ach => !ach.completed);
 
+  // Settings page handlers
+  const openNotifications = () => {
+    setShowNotifications(true);
+    setShowPrivacy(false);
+    setShowHelp(false);
+  };
+
+  const openPrivacy = () => {
+    setShowNotifications(false);
+    setShowPrivacy(true);
+    setShowHelp(false);
+  };
+
+  const openHelp = () => {
+    setShowNotifications(false);
+    setShowPrivacy(false);
+    setShowHelp(true);
+  };
+
+  const closeSettings = () => {
+    setShowNotifications(false);
+    setShowPrivacy(false);
+    setShowHelp(false);
+  };
+
   return (
     <div className="w-full px-3 py-4 space-y-5 pb-24">
       {/* Header */}
@@ -127,6 +167,169 @@ export default function ProfilePage() {
           Track your journey and achievements
         </p>
       </div>
+
+      {/* Settings Pages */}
+      <AnimatePresence>
+        {showNotifications && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 bg-white z-50 p-4"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={closeSettings}
+                className="h-8 w-8"
+              >
+                <ChevronRightIcon className="rotate-180" />
+              </Button>
+              <h2 className="text-lg font-bold">Notifications</h2>
+            </div>
+            
+            <Card className="shadow-sm border-0">
+              <CardContent className="p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Push Notifications</h3>
+                    <p className="text-sm text-gray-500">Receive alerts on your device</p>
+                  </div>
+                  <div className="w-10 h-6 bg-green-500 rounded-full relative">
+                    <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Email Notifications</h3>
+                    <p className="text-sm text-gray-500">Get updates via email</p>
+                  </div>
+                  <div className="w-10 h-6 bg-gray-300 rounded-full relative">
+                    <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Marketing Emails</h3>
+                    <p className="text-sm text-gray-500">Receive promotional offers</p>
+                  </div>
+                  <div className="w-10 h-6 bg-gray-300 rounded-full relative">
+                    <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+        
+        {showPrivacy && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 bg-white z-50 p-4"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={closeSettings}
+                className="h-8 w-8"
+              >
+                <ChevronRightIcon className="rotate-180" />
+              </Button>
+              <h2 className="text-lg font-bold">Privacy</h2>
+            </div>
+            
+            <Card className="shadow-sm border-0">
+              <CardContent className="p-4 space-y-4">
+                <div className="space-y-2">
+                  <h3 className="font-medium">Privacy Policy</h3>
+                  <p className="text-sm text-gray-500">
+                    We respect your privacy and are committed to protecting your personal information.
+                    Our Privacy Policy explains how we collect, use, and safeguard your data when you use our app.
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="font-medium">Data Collection</h3>
+                  <p className="text-sm text-gray-500">
+                    We collect minimal data to improve your experience. You can choose what data to share with us.
+                  </p>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Activity Tracking</h3>
+                    <p className="text-sm text-gray-500">Allow app to track your activity</p>
+                  </div>
+                  <div className="w-10 h-6 bg-green-500 rounded-full relative">
+                    <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+        
+        {showHelp && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed inset-0 bg-white z-50 p-4"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={closeSettings}
+                className="h-8 w-8"
+              >
+                <ChevronRightIcon className="rotate-180" />
+              </Button>
+              <h2 className="text-lg font-bold">Help & Support</h2>
+            </div>
+            
+            <Card className="shadow-sm border-0">
+              <CardContent className="p-4 space-y-4">
+                <div className="space-y-2">
+                  <h3 className="font-medium">Frequently Asked Questions</h3>
+                  <div className="rounded-lg border p-3 bg-gray-50">
+                    <p className="font-medium text-sm">How do I earn money?</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Complete tasks like watching videos, filling surveys, and referring friends to earn money.
+                    </p>
+                  </div>
+                  
+                  <div className="rounded-lg border p-3 bg-gray-50">
+                    <p className="font-medium text-sm">When can I withdraw?</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Once you reach ₹200, you can withdraw to your UPI or bank account.
+                    </p>
+                  </div>
+                  
+                  <div className="rounded-lg border p-3 bg-gray-50">
+                    <p className="font-medium text-sm">How do I refer friends?</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Go to the Tasks page and tap on "Refer & Earn" to get your unique link.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="pt-2">
+                  <Button className="w-full cta-button">
+                    Contact Support
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Profile Card with Progress */}
       <Card className="shadow-card overflow-hidden border-0 w-full">
@@ -253,7 +456,7 @@ export default function ProfilePage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsEditing(true)}
+              onClick={openEditProfile}
               className="mt-6 w-full rounded-lg border-gray-200"
             >
               <UserIcon className="w-4 h-4 mr-2" />
@@ -404,7 +607,10 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y">
-            <button className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={openNotifications}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+            >
               <div className="flex items-center gap-3">
                 <BellIcon size={18} className="text-gray-600" />
                 <span className="text-sm">Notifications</span>
@@ -412,7 +618,10 @@ export default function ProfilePage() {
               <ChevronRightIcon size={18} className="text-gray-400" />
             </button>
             
-            <button className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={openPrivacy}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+            >
               <div className="flex items-center gap-3">
                 <ShieldIcon size={18} className="text-gray-600" />
                 <span className="text-sm">Privacy</span>
@@ -420,7 +629,10 @@ export default function ProfilePage() {
               <ChevronRightIcon size={18} className="text-gray-400" />
             </button>
             
-            <button className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={openHelp}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+            >
               <div className="flex items-center gap-3">
                 <HelpCircle size={18} className="text-gray-600" />
                 <span className="text-sm">Help & Support</span>
@@ -466,6 +678,7 @@ export default function ProfilePage() {
                   <Input
                     id="name"
                     name="name"
+                    placeholder="Your Name"
                     value={formData.name}
                     onChange={handleChange}
                     className="rounded-lg"
@@ -478,6 +691,7 @@ export default function ProfilePage() {
                     id="email"
                     name="email"
                     type="email"
+                    placeholder="your.email@example.com"
                     value={formData.email}
                     onChange={handleChange}
                     className="rounded-lg"
