@@ -123,7 +123,7 @@ export default function WalletPage() {
   const monthlyEarnings = 235;
 
   return (
-    <div className="container max-w-md mx-auto px-4 py-4 space-y-5 pb-24">
+    <div className="w-full px-3 py-4 space-y-5 pb-24">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">Your Wallet</h1>
         <p className="text-sm text-muted-foreground">
@@ -272,7 +272,7 @@ export default function WalletPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Payment method selection */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 w-full">
             {PAYMENT_METHODS.map(method => (
               <div 
                 key={method.id}

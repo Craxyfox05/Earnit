@@ -84,7 +84,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container max-w-md mx-auto px-4 py-2 space-y-4 pb-16">
+    <div className="w-full px-3 py-2 space-y-4 pb-16">
       {/* Header with Logo and Wallet */}
       <header className="flex justify-between items-center py-4 sticky top-0 bg-background/95 backdrop-blur-sm z-10">
         <div className="flex items-center gap-3">
@@ -167,7 +167,7 @@ export default function DashboardPage() {
       </section>
       
       {/* Trust Badges */}
-      <section className="card-gradient rounded-lg depth-shadow p-4 text-center space-y-2">
+      <section className="card-gradient rounded-lg depth-shadow p-4 text-center space-y-2 w-full">
         <h3 className="text-sm font-medium">Join our growing community</h3>
         <div className="flex justify-center space-x-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
@@ -183,14 +183,14 @@ export default function DashboardPage() {
       </section>
       
       {/* "More Tasks" CTA Button */}
-      <div className="py-4 text-center">
-        <Link href="/tasks" className="cta-button inline-block py-3 px-8 tap-animation">
+      <div className="py-4 text-center w-full">
+        <Link href="/tasks" className="cta-button inline-block py-3 px-8 tap-animation w-full">
           More Tasks to Earn ₹
         </Link>
       </div>
       
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white card-gradient border-t flex justify-around items-center py-2 px-4 z-10 depth-shadow">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white card-gradient border-t flex justify-around items-center py-2 px-2 z-10 depth-shadow w-full">
         <Link 
           href="/dashboard" 
           className="flex flex-col items-center primary-gradient bg-clip-text text-transparent tap-animation"

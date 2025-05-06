@@ -35,9 +35,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body suppressHydrationWarning className="antialiased font-sans max-w-screen-md mx-auto">
-        <ClientBody>{children}</ClientBody>
-        <Toaster position="bottom-center" />
+      <body suppressHydrationWarning className="antialiased font-sans w-full">
+        <div className="w-full sm:max-w-md mx-auto">
+          <ClientBody>{children}</ClientBody>
+          <Toaster position="bottom-center" />
+        </div>
       </body>
     </html>
   );

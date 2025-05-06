@@ -119,7 +119,7 @@ export default function ProfilePage() {
   const inProgressAchievements = user.achievements.filter(ach => !ach.completed);
 
   return (
-    <div className="container max-w-md mx-auto px-4 py-4 space-y-5 pb-24">
+    <div className="w-full px-3 py-4 space-y-5 pb-24">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">Your Profile</h1>
@@ -129,7 +129,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Card with Progress */}
-      <Card className="shadow-card overflow-hidden border-0">
+      <Card className="shadow-card overflow-hidden border-0 w-full">
         <CardContent className="p-0">
           {/* Top Banner with Level - Black gradient background */}
           <div className="relative">
