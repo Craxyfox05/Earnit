@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Home, User, PieChart, Users, Flame } from "lucide-react";
+import { Bell, Home, User, PieChart, Users, Flame, LogIn } from "lucide-react";
 
 // Import components
 import { WalletBalance } from "@/components/ui/wallet-balance";
@@ -13,7 +13,9 @@ import { StreakBanner } from "@/components/ui/streak-banner";
 import { ScarcityNotice } from "@/components/ui/scarcity-notice";
 import { RewardAnimation } from "@/components/ui/reward-animation";
 import ImprovedTaskCard from "@/components/tasks/ImprovedTaskCard";
+import TaskDetailsModal from "@/components/tasks/TaskDetailsModal";
 import { useUser } from "@/context/UserContext";
+import { Button } from "@/components/ui/button";
 
 // Sample task data
 const SAMPLE_TASKS = [
@@ -73,12 +75,27 @@ export default function DashboardPage() {
   const [referralsCompleted, setReferralsCompleted] = useState(3);
   const [referralsRequired, setReferralsRequired] = useState(10);
   
-  const handleTaskComplete = (amount: number) => {
-    setRewardAmount(amount);
+  // State for task details modal
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [completedTaskIds, setCompletedTaskIds] = useState<string[]>([]);
+  
+  const handleTaskClick = (task: any) => {
+    setSelectedTask(task);
+    setIsTaskModalOpen(true);
+  };
+
+  const handleTaskComplete = (taskId: string) => {
+    const task = SAMPLE_TASKS.find(t => t.id === taskId);
+    if (!task) return;
+    
+    setRewardAmount(task.payout);
     setShowReward(true);
-    setBalance((prev: number) => prev + amount);
+    setBalance((prev: number) => prev + task.payout);
     setTasksCompleted((prev: number) => prev + 1);
     setTasksRemaining((prev: number) => prev - 1);
+    setIsTaskModalOpen(false);
+    setCompletedTaskIds(prev => [...prev, taskId]);
     
     // Hide reward animation after 3 seconds
     setTimeout(() => {
@@ -110,7 +127,18 @@ export default function DashboardPage() {
             <p className="text-xs text-gray-500 -mt-1">Complete tasks and earn</p>
           </div>
         </div>
-        <WalletBalance balance={balance} />
+        
+        {/* Login button or wallet balance */}
+        {isLoggedIn ? (
+          <WalletBalance balance={balance} />
+        ) : (
+          <Link href="/login">
+            <Button className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200">
+              <LogIn size={16} />
+              <span>Login</span>
+            </Button>
+          </Link>
+        )}
       </header>
 
       {/* Welcome message - conditional rendering */}
@@ -124,7 +152,7 @@ export default function DashboardPage() {
           <>
             <p className="font-medium">Login to Start Earning 💰</p>
             <p className="text-sm text-gray-500">Complete tasks and get instant payouts</p>
-            <Link href="/profile">
+            <Link href="/login">
               <button className="mt-2 cta-button py-2 px-4 text-sm w-full">Login Now</button>
             </Link>
           </>
@@ -132,10 +160,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Progress Bar */}
-      <WithdrawalProgress currentAmount={balance} targetAmount={200} />
+      {isLoggedIn && <WithdrawalProgress currentAmount={balance} targetAmount={200} />}
       
       {/* Streak Banner */}
-      {streakDays > 0 && (
+      {isLoggedIn && streakDays > 0 && (
         <StreakBanner streakDays={streakDays} />
       )}
       
@@ -190,7 +218,8 @@ export default function DashboardPage() {
             <ImprovedTaskCard
               key={task.id}
               task={task}
-              onClick={() => handleTaskComplete(task.payout)}
+              onClick={() => handleTaskClick(task)}
+              disabled={completedTaskIds.includes(task.id)}
             />
           ))}
         </div>
@@ -257,6 +286,14 @@ export default function DashboardPage() {
           <RewardAnimation amount={rewardAmount} show={showReward} />
         )}
       </AnimatePresence>
+      
+      {/* Task Details Modal */}
+      <TaskDetailsModal
+        task={selectedTask}
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
+        onComplete={handleTaskComplete}
+      />
     </div>
   );
 }
