@@ -62,6 +62,7 @@ const SAMPLE_ACTIVITIES = [
 
 export default function DashboardPage() {
   const { userData } = useUser();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [balance, setBalance] = useState(125);
   const [streakDays, setStreakDays] = useState(3);
   const [showReward, setShowReward] = useState(false);
@@ -85,6 +86,15 @@ export default function DashboardPage() {
     }, 3000);
   };
 
+  // Simulate login after 3 seconds for demo purposes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoggedIn(true);
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="w-full px-3 py-2 space-y-4 pb-16">
       {/* Header with Logo and Wallet */}
@@ -103,10 +113,22 @@ export default function DashboardPage() {
         <WalletBalance balance={balance} />
       </header>
 
-      {/* Welcome message with user's name */}
+      {/* Welcome message - conditional rendering */}
       <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-        <p className="font-medium">Hello, {userData.name.split(' ')[0]}! 👋</p>
-        <p className="text-sm text-gray-500">Welcome back to EarnIt</p>
+        {isLoggedIn ? (
+          <>
+            <p className="font-medium">Hello, {userData.name.split(' ')[0]}! 👋</p>
+            <p className="text-sm text-gray-500">Welcome back to EarnIt</p>
+          </>
+        ) : (
+          <>
+            <p className="font-medium">Login to Start Earning 💰</p>
+            <p className="text-sm text-gray-500">Complete tasks and get instant payouts</p>
+            <Link href="/profile">
+              <button className="mt-2 cta-button py-2 px-4 text-sm w-full">Login Now</button>
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Progress Bar */}
