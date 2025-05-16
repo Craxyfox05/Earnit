@@ -1,42 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
-// In a real app, this would be a proper auth check with a token or session
-const fakeAuthCheck = (): boolean => {
-  // For demo purposes, we'll simulate being logged in
-  // In a real app, check localStorage, cookies, or a state management solution
-  return true; // Set to true to simulate logged in state for all pages
-};
-
-export function AuthWrapper({ children }: { children: React.ReactNode }) {
+export function AuthWrapper({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated
-    const isAuthenticated = fakeAuthCheck();
+    setIsClient(true);
+  }, []);
 
-    // If this is a protected route and user is not authenticated
-    if (!isAuthenticated && pathname !== '/') {
-      toast.error("Please login to access this page");
-      router.push('/');
-    }
-
-    setIsLoading(false);
-  }, [pathname, router]);
-
-  if (isLoading) {
+  // If we're in the browser and still loading, show nothing
+  if (!isClient || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-pulse text-center">
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-gray-200 border-t-green-500 rounded-full animate-spin"></div>
       </div>
     );
+  }
+
+  // If no user is found and we're not on the login page, redirect to login
+  if (!user && pathname !== "/login" && isClient) {
+    // Check localStorage as a backup (in case Firebase auth state not yet synced)
+    const storedUser = localStorage.getItem('user');
+    const isAuthenticated = storedUser ? JSON.parse(storedUser).isAuthenticated : false;
+    
+    if (!isAuthenticated) {
+      router.push("/login");
+      return null;
+    }
   }
 
   return <>{children}</>;

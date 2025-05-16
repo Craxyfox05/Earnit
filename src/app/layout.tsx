@@ -1,31 +1,11 @@
-import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import type { Metadata } from "next";
 import ClientBody from "./ClientBody";
-import { Toaster } from "@/components/ui/sonner";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
-  title: "EarnIt - Complete Tasks, Earn Money",
-  description: "The premium platform to earn money by completing simple online tasks",
-  keywords: ["earn money online", "online tasks", "make money", "complete tasks for money"],
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: "cover",
+  title: "EarnIt - Earn Money Easily",
+  description: "Complete tasks, watch ads, and earn money on the go",
 };
 
 export default function RootLayout({
@@ -34,12 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body suppressHydrationWarning className="antialiased font-sans w-full bg-white">
-        <div className="w-full sm:max-w-md mx-auto overflow-x-hidden">
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <AuthProvider>
           <ClientBody>{children}</ClientBody>
-          <Toaster position="bottom-center" />
-        </div>
+        </AuthProvider>
       </body>
     </html>
   );

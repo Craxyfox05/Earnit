@@ -1,4 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EarnIt - Mobile Money Earning Platform
+
+EarnIt is a Next.js-based mobile application that allows users to earn money by completing various tasks, watching ads, taking surveys, and referring friends.
+
+## Project Overview
+
+EarnIt is a comprehensive money-earning platform with the following key features:
+
+- **Multiple Earning Methods**:
+  - Complete tasks (YouTube subscriptions, Instagram follows)
+  - Watch video ads
+  - Take surveys
+  - Refer friends
+
+- **User Dashboard**:
+  - Track current balance
+  - View earnings statistics
+  - Monitor daily streaks
+  - Track task completion
+
+- **Wallet Management**:
+  - View transaction history
+  - Request withdrawals (minimum threshold ₹200)
+  - Multiple payment methods (UPI, Paytm, Bank Transfer)
+
+- **Engagement Features**:
+  - Achievement system
+  - Daily streaks
+  - Real-time activity ticker
+
+## Technology Stack
+
+- **Framework**: Next.js 15.2.0
+- **UI Components**: shadcn/ui with Radix UI
+- **Styling**: Tailwind CSS
+- **Animations**: Framer Motion
+- **Form Handling**: React Hook Form and Zod
+- **Authentication**: Phone-based OTP authentication
+
+## Key Pages
+
+- **Home Page**: Introduction to the platform with earning options
+- **Dashboard**: User statistics and quick actions
+- **Tasks**: Available tasks sorted by category
+- **Wallet**: Balance management and withdrawal options
+- **Profile**: User information and settings
+- **Referral**: Friend referral program
 
 ## Getting Started
 
@@ -16,21 +62,50 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `src/app`: Next.js application routes
+- `src/components`: Reusable UI components
+  - `ui/`: Base UI components (shadcn/ui)
+  - `home/`: Homepage-specific components
+  - `dashboard/`: Dashboard components
+  - `tasks/`: Task-related components
+  - `layout/`: Shared layout components (headers, footers)
+  - `auth/`: Authentication components
+- `src/lib`: Utility functions and shared code
+- `src/context`: React context providers
 
-## Learn More
+## Development Features
 
-To learn more about Next.js, take a look at the following resources:
+- TypeScript support
+- ESLint and Biome for code quality
+- Mobile-first responsive design
+- Dark mode support via next-themes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The application is configured for deployment on various platforms:
+- Vercel (preferred)
+- Netlify (configured via netlify.toml)
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+[MIT](https://choosealicense.com/licenses/mit/)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBb7gzV_lnLrTszzv7R2Tnk4kwFD2qLntU",
+  authDomain: "earnit-186b9.firebaseapp.com",
+  projectId: "earnit-186b9",
+  storageBucket: "earnit-186b9.firebasestorage.app",
+  messagingSenderId: "905185903535",
+  appId: "1:905185903535:web:45d4152ef8620b64db255a"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);

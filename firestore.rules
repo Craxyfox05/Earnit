@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions for authorization
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isCurrentUser(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+    
+    function isCloudFunction() {
+      return request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // Wallets - users can read their own, but only admins/cloud functions can write
+    match /wallets/{userId} {
+      allow read: if isCurrentUser(userId);
+      // Only allow system functions or admins to write to wallets
+      allow write: if isAdmin() || isCloudFunction();
+    }
+    
+    // Users - users can read/update their own profile data but not sensitive fields
+    match /users/{userId} {
+      allow read: if isCurrentUser(userId) || isAdmin();
+      // Allow users to update their own non-sensitive fields
+      allow update: if isCurrentUser(userId) && 
+                     !request.resource.data.diff(resource.data).affectedKeys()
+                      .hasAny(['totalEarnings', 'balance', 'isAdmin', 'completedTasks']);
+      allow create: if isCurrentUser(userId);
+    }
+    
+    // Tasks - all users can read tasks, but only admins can create/update
+    match /tasks/{taskId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // UserTasks - users can read their own tasks and create them
+    match /userTasks/{docId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      // Allow users to create their own task submissions and update status only
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && 
+                      resource.data.userId == request.auth.uid &&
+                      // Only allow updating certain fields
+                      request.resource.data.diff(resource.data).affectedKeys()
+                        .hasOnly(['status', 'completedAt', 'proofData']);
+    }
+    
+    // Transactions - users can read their own transactions, only functions can write
+    match /transactions/{transactionId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow write: if isAdmin() || isCloudFunction();
+    }
+    
+    // Referrals - users can read their own referrals
+    match /referrals/{referralId} {
+      allow read: if isSignedIn() && 
+                    (resource.data.referrerId == request.auth.uid || 
+                     resource.data.referreeId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.referrerId == request.auth.uid;
+    }
+    
+    // Admin-only section
+    match /admin/{docId} {
+      allow read, write: if isAdmin();
+    }
+  }
+} 
